@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Expense Tracker
 
-## Getting Started
+Production-ready expense tracking platform built with Next.js App Router, TypeScript, Tailwind CSS, MongoDB, Mongoose, JWT auth, and Gemini AI.
 
-First, run the development server:
+## Stack
+
+- Next.js App Router
+- TypeScript
+- Tailwind CSS
+- shadcn/ui-style primitives
+- MongoDB + Mongoose
+- JWT authentication with httpOnly cookies
+- bcryptjs password hashing
+- Gemini 1.5 Flash expense extraction
+- Recharts analytics
+- React Hook Form + Zod validation
+
+## Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Environment
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a `.env` file from `.env.example` and set:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `MONGODB_URI`
+- `JWT_SECRET`
+- `GEMINI_API_KEY`
+- `NEXT_PUBLIC_APP_URL`
 
-## Learn More
+## Key Routes
 
-To learn more about Next.js, take a look at the following resources:
+### Frontend
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `/frontend`
+- `/frontend/login`
+- `/frontend/register`
+- `/frontend/dashboard`
+- `/frontend/expenses`
+- `/frontend/budgets`
+- `/frontend/import`
+- `/frontend/settings`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Admin
 
-## Deploy on Vercel
+- `/admin`
+- `/admin/users`
+- `/admin/analytics`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### API
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `POST /api/auth/logout`
+- `GET /api/auth/me`
+- `GET /api/expenses`
+- `POST /api/expenses`
+- `PUT /api/expenses/:id`
+- `DELETE /api/expenses/:id`
+- `GET /api/budgets`
+- `POST /api/budgets`
+- `PUT /api/budgets/:id`
+- `DELETE /api/budgets/:id`
+- `GET /api/dashboard`
+- `POST /api/ai/extract-expense`
+- `GET /api/export/csv`
+- `GET /api/admin/summary`
+- `GET /api/admin/users`
+- `GET /api/admin/analytics`
+
+## Notes
+
+- Protected pages are enforced by `src/middleware.ts`.
+- MongoDB connection reuse is handled in `src/lib/db.ts`.
+- AI requests are rate limited in memory for safety.
+- The app is Vercel-ready once the environment variables are configured.
