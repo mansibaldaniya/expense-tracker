@@ -75,5 +75,9 @@ export default async function FrontendLayout({
     );
   }
 
-  return <FrontendAuthenticatedShell name={user.name} role={user.role}>{children}</FrontendAuthenticatedShell>;
+  return (
+    <FrontendAuthenticatedShell name={user!.name} role={user!.role}>
+      {children}
+    </FrontendAuthenticatedShell>
+  );
 }
