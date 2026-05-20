@@ -23,6 +23,10 @@ import { MonthPicker } from "@/components/shared/month-picker";
 import { EmptyState } from "@/components/shared/empty-state";
 
 const palette = ["#34d399", "#60a5fa", "#f59e0b", "#f87171", "#a78bfa", "#22d3ee"];
+const monthTickStyle = {
+  fill: "#94a3b8",
+  fontSize: 11,
+};
 
 type PiePoint = { name: string; value: number };
 type TrendPoint = { month: string; total: number };
@@ -86,6 +90,10 @@ function getAlertStatus(percent: number): "safe" | "warning" | "danger" {
   if (percent >= 100) return "danger";
   if (percent >= 80) return "warning";
   return "safe";
+}
+
+function formatMonthTick(value: string) {
+  return value.length > 3 ? value.slice(0, 3) : value;
 }
 
 export function DashboardCharts({ initialMonthBreakdown, trendData }: DashboardChartsProps) {
@@ -190,8 +198,19 @@ export function DashboardCharts({ initialMonthBreakdown, trendData }: DashboardC
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={trendData} barCategoryGap="24%">
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-              <XAxis dataKey="month" stroke="#94a3b8" tickMargin={12} interval={0} />
-              <YAxis stroke="#94a3b8" tickMargin={12} />
+              <XAxis
+                dataKey="month"
+                stroke="#94a3b8"
+                tick={monthTickStyle}
+                tickMargin={10}
+                interval={0}
+                angle={-35}
+                textAnchor="end"
+                height={42}
+                minTickGap={0}
+                tickFormatter={formatMonthTick}
+              />
+              <YAxis stroke="#94a3b8" tickMargin={10} tick={monthTickStyle} width={36} />
               <Tooltip
                 cursor={false}
                 contentStyle={{
@@ -294,8 +313,19 @@ export function DashboardCharts({ initialMonthBreakdown, trendData }: DashboardC
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={trendData}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-              <XAxis dataKey="month" stroke="#94a3b8" tickMargin={12} interval={0} />
-              <YAxis stroke="#94a3b8" tickMargin={12} />
+              <XAxis
+                dataKey="month"
+                stroke="#94a3b8"
+                tick={monthTickStyle}
+                tickMargin={10}
+                interval={0}
+                angle={-35}
+                textAnchor="end"
+                height={42}
+                minTickGap={0}
+                tickFormatter={formatMonthTick}
+              />
+              <YAxis stroke="#94a3b8" tickMargin={10} tick={monthTickStyle} width={36} />
               <Tooltip
                 cursor={false}
                 contentStyle={{

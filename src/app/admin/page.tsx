@@ -115,6 +115,14 @@ function chartTooltipStyle() {
 }
 
 const categoryPalette = ["#34d399", "#60a5fa", "#f59e0b", "#f87171", "#a78bfa", "#22d3ee"];
+const monthTickStyle = {
+  fill: "#94a3b8",
+  fontSize: 11,
+};
+
+function formatMonthTick(value: string) {
+  return value.length > 3 ? value.slice(0, 3) : value;
+}
 
 export default function AdminHomePage() {
   const [summary, setSummary] = useState<AdminSummary | null>(null);
@@ -237,8 +245,19 @@ export default function AdminHomePage() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={userTrend} barCategoryGap="24%">
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-                <XAxis dataKey="month" stroke="#94a3b8" tickMargin={12} interval={0} />
-                <YAxis stroke="#94a3b8" tickMargin={12} allowDecimals={false} />
+                <XAxis
+                  dataKey="month"
+                  stroke="#94a3b8"
+                  tick={monthTickStyle}
+                  tickMargin={10}
+                  interval={0}
+                  angle={-35}
+                  textAnchor="end"
+                  height={42}
+                  minTickGap={0}
+                  tickFormatter={formatMonthTick}
+                />
+                <YAxis stroke="#94a3b8" tickMargin={10} allowDecimals={false} tick={monthTickStyle} width={36} />
                 <Tooltip {...chartTooltipStyle()} />
                 <Bar dataKey="total" radius={[12, 12, 0, 0]} fill="#34d399" maxBarSize={40} />
               </BarChart>
@@ -261,8 +280,19 @@ export default function AdminHomePage() {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={expenseTrend}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-                <XAxis dataKey="month" stroke="#94a3b8" tickMargin={12} interval={0} />
-                <YAxis stroke="#94a3b8" tickMargin={12} />
+                <XAxis
+                  dataKey="month"
+                  stroke="#94a3b8"
+                  tick={monthTickStyle}
+                  tickMargin={10}
+                  interval={0}
+                  angle={-35}
+                  textAnchor="end"
+                  height={42}
+                  minTickGap={0}
+                  tickFormatter={formatMonthTick}
+                />
+                <YAxis stroke="#94a3b8" tickMargin={10} tick={monthTickStyle} width={36} />
                 <Tooltip {...chartTooltipStyle()} />
                 <Line type="monotone" dataKey="total" stroke="#60a5fa" strokeWidth={3} dot={false} />
               </LineChart>
