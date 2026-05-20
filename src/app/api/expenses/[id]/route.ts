@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
 import { getAuthFromRequest } from "@/lib/request-auth";
-import { deleteExpense, updateExpense } from "@/services/expense.service";
+import { deleteExpense, getExpenseById, updateExpense } from "@/services/expense.service";
 import { apiError, apiSuccess } from "@/lib/api-response";
 
 type Params = {
@@ -25,6 +25,25 @@ export async function PUT(
     return apiSuccess({ expense }, "Expense updated");
   } catch (error) {
     return apiError(error instanceof Error ? error.message : "Unable to update expense");
+  }
+}
+
+export async function GET(
+  request: NextRequest,
+  context: { params: Promise<Params> }
+) {
+  try {
+    await connectDB();
+    const auth = getAuthFromRequest(request);
+    if (!auth) {
+      return apiError("Unauthorized", 401);
+    }
+
+    const { id } = await context.params;
+    const expense = await getExpenseById(auth.userId, id);
+    return apiSuccess({ expense }, "Expense loaded");
+  } catch (error) {
+    return apiError(error instanceof Error ? error.message : "Unable to load expense");
   }
 }
 

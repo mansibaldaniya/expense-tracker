@@ -12,7 +12,8 @@ export async function GET(request: NextRequest) {
       return apiError("Forbidden", 403);
     }
 
-    const summary = await getAdminDashboard();
+    const month = request.nextUrl.searchParams.get("month");
+    const summary = await getAdminDashboard(month);
     return apiSuccess(summary, "Admin summary loaded");
   } catch (error) {
     return apiError(error instanceof Error ? error.message : "Unable to load admin summary");

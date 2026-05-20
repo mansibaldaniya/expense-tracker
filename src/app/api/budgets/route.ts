@@ -12,8 +12,8 @@ export async function GET(request: NextRequest) {
       return apiError("Unauthorized", 401);
     }
 
-    const budgets = await listBudgets(auth.userId);
-    return apiSuccess({ budgets }, "Budgets loaded");
+    const data = await listBudgets(auth.userId, request.nextUrl.searchParams);
+    return apiSuccess(data, "Budgets loaded");
   } catch (error) {
     return apiError(error instanceof Error ? error.message : "Unable to load budgets");
   }

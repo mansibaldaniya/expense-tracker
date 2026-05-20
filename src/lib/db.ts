@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { cleanupUserProfilePhotos, ensureAdminBootstrap } from "@/lib/bootstrap";
 
 type MongooseCache = {
   conn: typeof mongoose | null;
@@ -39,6 +40,8 @@ export async function connectDB(): Promise<typeof mongoose> {
   }
 
   cached.conn = await cached.promise;
+  await cleanupUserProfilePhotos();
+  await ensureAdminBootstrap();
 
   return cached.conn;
 }

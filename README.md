@@ -11,7 +11,7 @@ Production-ready expense tracking platform built with Next.js App Router, TypeSc
 - MongoDB + Mongoose
 - JWT authentication with httpOnly cookies
 - bcryptjs password hashing
-- Gemini 1.5 Flash expense extraction
+- Gemini 2.5 Flash expense extraction
 - Recharts analytics
 - React Hook Form + Zod validation
 
@@ -29,13 +29,18 @@ Create a `.env` file from `.env.example` and set:
 - `MONGODB_URI`
 - `JWT_SECRET`
 - `GEMINI_API_KEY`
+- `GEMINI_MODEL` optional, defaults to `gemini-2.5-flash`
 - `NEXT_PUBLIC_APP_URL`
+- `ADMIN_EMAIL`
+- `ADMIN_NAME`
+- `ADMIN_PASSWORD`
 
 ## Key Routes
 
 ### Frontend
 
 - `/frontend`
+- `/frontend/about-us`
 - `/frontend/login`
 - `/frontend/register`
 - `/frontend/dashboard`
@@ -52,6 +57,7 @@ Create a `.env` file from `.env.example` and set:
 
 ### API
 
+- `GET /api/public/overview`
 - `POST /api/auth/register`
 - `POST /api/auth/login`
 - `POST /api/auth/logout`
@@ -71,9 +77,14 @@ Create a `.env` file from `.env.example` and set:
 - `GET /api/admin/users`
 - `GET /api/admin/analytics`
 
+### Uploads
+
+- The AI import page accepts pasted text, PDFs, images, and DOCX uploads.
+
 ## Notes
 
 - Protected pages are enforced by `src/middleware.ts`.
 - MongoDB connection reuse is handled in `src/lib/db.ts`.
+- Admin bootstrap uses `ADMIN_EMAIL`, `ADMIN_NAME`, and `ADMIN_PASSWORD` to ensure an admin user exists in MongoDB.
 - AI requests are rate limited in memory for safety.
 - The app is Vercel-ready once the environment variables are configured.

@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { UserModel } from "@/models/User";
-import { loginSchema, registerSchema } from "@/lib/validations/auth";
+import { changePasswordSchema, loginSchema, registerSchema } from "@/lib/validations/auth";
 import { signAuthToken } from "@/lib/auth";
 
 export async function registerUser(input: unknown) {
@@ -79,4 +79,23 @@ export async function getUserById(userId: string) {
     role: user.role,
     createdAt: user.createdAt,
   };
+}
+
+export async function changePassword(userId: string, input: unknown) {
+  const payload = changePasswordSchema.parse(input);
+  const user = await UserModel.findById(userId).select("+password");
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const isValid = await bcrypt.compare(payload.currentPassword, user.password);
+  if (!isValid) {
+    throw new Error("Current password is incorrect");
+  }
+
+  user.password = await bcrypt.hash(payload.newPassword, 12);
+  await user.save();
+
+  return true;
 }

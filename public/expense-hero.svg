@@ -1,0 +1,45 @@
+<svg width="720" height="520" viewBox="0 0 720 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="120" y1="60" x2="620" y2="460" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F172A"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="card" x1="180" y1="120" x2="540" y2="400" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#111C33"/>
+      <stop offset="1" stop-color="#0B1324"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="260" y1="180" x2="460" y2="340" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#34D399"/>
+      <stop offset="1" stop-color="#60A5FA"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="696" height="496" rx="40" fill="url(#bg)" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+  <circle cx="132" cy="110" r="44" fill="#0F172A" stroke="rgba(255,255,255,0.12)" />
+  <circle cx="588" cy="142" r="52" fill="#0F172A" stroke="rgba(255,255,255,0.12)" />
+  <circle cx="570" cy="380" r="58" fill="#0F172A" stroke="rgba(255,255,255,0.12)" />
+  <rect x="194" y="118" width="332" height="284" rx="30" fill="url(#card)" stroke="rgba(255,255,255,0.08)" />
+  <rect x="226" y="150" width="98" height="98" rx="28" fill="rgba(52,211,153,0.12)" />
+  <circle cx="275" cy="199" r="26" fill="rgba(15,23,42,0.55)" stroke="rgba(52,211,153,0.35)" stroke-width="2" />
+  <path d="M257 216L268 176L279 216" stroke="#34D399" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M263 205H273" stroke="#34D399" stroke-width="6" stroke-linecap="round"/>
+  <path d="M287 177V216" stroke="#60A5FA" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="287" cy="167" r="4" fill="#60A5FA"/>
+  <path d="M296 185H304" stroke="#60A5FA" stroke-width="4" stroke-linecap="round"/>
+  <path d="M246 185H254" stroke="#34D399" stroke-width="4" stroke-linecap="round"/>
+  <text x="354" y="186" fill="#E5E7EB" font-size="22" font-family="Arial, sans-serif">Smart expense tracking</text>
+  <text x="354" y="226" fill="#FFFFFF" font-size="32" font-weight="700" font-family="Arial, sans-serif">Capture, categorize, control</text>
+  <rect x="226" y="280" width="98" height="92" rx="24" fill="rgba(52,211,153,0.12)" />
+  <text x="256" y="320" fill="#A7F3D0" font-size="18" font-weight="700" font-family="Arial, sans-serif">Food</text>
+  <text x="254" y="347" fill="#FFFFFF" font-size="26" font-weight="700" font-family="Arial, sans-serif">24%</text>
+  <rect x="344" y="280" width="98" height="92" rx="24" fill="rgba(96,165,250,0.12)" />
+  <text x="370" y="320" fill="#BFDBFE" font-size="18" font-weight="700" font-family="Arial, sans-serif">Bills</text>
+  <text x="370" y="347" fill="#FFFFFF" font-size="26" font-weight="700" font-family="Arial, sans-serif">31%</text>
+  <rect x="462" y="280" width="38" height="92" rx="19" fill="url(#accent)" opacity="0.8"/>
+  <circle cx="132" cy="110" r="14" fill="#34D399"/>
+  <path d="M126 110L131 115L139 104" stroke="#07111F" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M574 142L586 142L586 154" stroke="#60A5FA" stroke-width="4" stroke-linecap="round"/>
+  <path d="M587 142L599 142" stroke="#60A5FA" stroke-width="4" stroke-linecap="round"/>
+  <path d="M587 142L587 130" stroke="#60A5FA" stroke-width="4" stroke-linecap="round"/>
+  <path d="M552 380H588" stroke="#A78BFA" stroke-width="6" stroke-linecap="round"/>
+  <path d="M570 362V398" stroke="#A78BFA" stroke-width="6" stroke-linecap="round"/>
+</svg>

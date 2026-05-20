@@ -15,4 +15,6 @@ export const expenseQuerySchema = z.object({
   month: z.string().regex(/^\d{4}-\d{2}$/).optional(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   search: z.string().optional(),
+  sortBy: z.enum(["createdAt", "date"]).default("createdAt"),
+  sortOrder: z.enum(["asc", "desc"]).default("desc"),
 });

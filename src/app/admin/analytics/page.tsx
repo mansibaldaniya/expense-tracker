@@ -1,50 +1,28 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import Link from "next/link";
+import { ArrowRight, BarChart3 } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { DashboardCharts } from "@/components/charts/dashboard-charts";
-import type { ApiResponse } from "@/types";
-
-type AnalyticsItem = {
-  category: string;
-  total: number;
-};
 
 export default function AdminAnalyticsPage() {
-  const [analytics, setAnalytics] = useState<AnalyticsItem[]>([]);
-
-  useEffect(() => {
-    async function loadAnalytics() {
-      const response = await fetch("/api/admin/analytics", { cache: "no-store" });
-      const data = (await response.json()) as ApiResponse<{
-        analytics: AnalyticsItem[];
-      }>;
-
-      if (!response.ok) {
-        toast.error(data.message ?? "Unable to load analytics");
-        return;
-      }
-
-      setAnalytics(data.data.analytics ?? []);
-    }
-
-    void loadAnalytics();
-  }, []);
-
-  const pieData = analytics.map((item) => ({
-    name: item.category,
-    value: item.total,
-  }));
-
   return (
     <Card className="p-6">
-      <h1 className="text-2xl font-semibold">Analytics</h1>
-      <p className="mt-2 text-sm text-slate-300">
-        Platform-wide analytics pulled from the admin API.
-      </p>
-      <div className="mt-6">
-        <DashboardCharts pieData={pieData} trendData={pieData.map((item, index) => ({ month: item.name, total: item.value + index * 100 }))} />
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-emerald-300" />
+            <h1 className="text-2xl font-semibold text-white">Analytics</h1>
+          </div>
+          <p className="mt-2 max-w-2xl text-sm text-slate-400">
+            The main charts and admin totals now live on the Overview page, where the data is loaded from the real
+            admin summary API.
+          </p>
+        </div>
+        <Link
+          href="/admin"
+          className="inline-flex items-center gap-2 rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
+        >
+          Open overview
+          <ArrowRight className="h-4 w-4" />
+        </Link>
       </div>
     </Card>
   );

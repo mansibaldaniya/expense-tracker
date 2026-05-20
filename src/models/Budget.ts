@@ -3,6 +3,7 @@ import mongoose, { Schema, models, model } from "mongoose";
 export type BudgetDocument = {
   _id: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
+  code?: string;
   category: string;
   limit: number;
   month: string;
@@ -14,6 +15,7 @@ export type BudgetDocument = {
 const budgetSchema = new Schema<BudgetDocument>(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true },
+    code: { type: String, index: true },
     category: { type: String, required: true, index: true },
     limit: { type: Number, required: true, min: 0 },
     month: { type: String, required: true, index: true },
