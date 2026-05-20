@@ -41,7 +41,7 @@ export default async function FrontendLayout({
 
   if (!isAuthed) {
     return (
-      <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(16,185,129,0.18),_transparent_35%),radial-gradient(circle_at_top_right,_rgba(59,130,246,0.14),_transparent_30%),linear-gradient(180deg,_#07111f_0%,_#0b1220_55%,_#0f172a_100%)] text-white">
+      <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top_left,_rgba(16,185,129,0.18),_transparent_35%),radial-gradient(circle_at_top_right,_rgba(59,130,246,0.14),_transparent_30%),linear-gradient(180deg,_#07111f_0%,_#0b1220_55%,_#0f172a_100%)] text-white">
         <header className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/70 backdrop-blur-xl">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
             <Link href="/frontend" className="text-lg font-semibold tracking-tight">
@@ -70,7 +70,13 @@ export default async function FrontendLayout({
             </nav>
           </div>
         </header>
-        <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">{children}</main>
+        <main className="mx-auto flex-1 max-w-7xl px-4 py-8 sm:px-6 lg:px-8">{children}</main>
+        <footer className="border-t border-white/10 bg-slate-950/60">
+          <div className="mx-auto max-w-7xl px-4 py-3 text-center text-xs text-slate-500 sm:px-6 lg:px-8">
+            <span>© 2026 AI Expense Tracker. Developed by </span>
+            <span className="font-medium text-slate-200">Mansi Baldaniya</span>
+          </div>
+        </footer>
       </div>
     );
   }

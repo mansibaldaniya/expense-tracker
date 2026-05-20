@@ -125,10 +125,10 @@ function MetricCard({
   href: string;
 }) {
   return (
-    <Link href={href} className="block outline-none focus-visible:outline-none">
-      <Card className="relative overflow-hidden p-6 transition-transform duration-200 hover:-translate-y-0.5 hover:border-white/15">
+    <Link href={href} className="block h-full outline-none focus-visible:outline-none">
+      <Card className="relative flex h-full min-h-[15rem] flex-col overflow-hidden p-6 transition-transform duration-200 hover:-translate-y-0.5 hover:border-white/15">
         <div className={`absolute inset-x-0 top-0 h-1 ${accentClassName}`} />
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex h-full items-start justify-between gap-4">
           <div>
             <p className="text-sm uppercase tracking-[0.24em] text-slate-400">{title}</p>
             <p className="mt-3 text-3xl font-semibold text-white">{value}</p>

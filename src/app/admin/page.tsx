@@ -38,18 +38,6 @@ type AdminSummary = {
     percent: number;
     status: "safe" | "warning" | "danger";
   }>;
-  recentUsers: Array<{
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-  }>;
-  recentExpenses: Array<{
-    id: string;
-    amount: number;
-    category: string;
-    note: string;
-  }>;
 };
 
 function MetricCard({
@@ -66,9 +54,9 @@ function MetricCard({
   accentClassName: string;
 }) {
   return (
-    <Card className="relative overflow-hidden p-6">
+    <Card className="relative flex h-full min-h-[15rem] flex-col overflow-hidden p-6">
       <div className={`absolute inset-x-0 top-0 h-1 ${accentClassName}`} />
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex h-full items-start justify-between gap-4">
         <div>
           <p className="text-sm uppercase tracking-[0.24em] text-slate-400">{title}</p>
           <p className="mt-3 text-3xl font-semibold text-white">{value.toLocaleString()}</p>
@@ -199,9 +187,6 @@ export default function AdminHomePage() {
       })(),
     [summary?.budgetAlerts]
   );
-
-  const isEmptyDashboard =
-    !loading && userTrend.length === 0 && expenseTrend.length === 0 && budgetAlertCards.length === 0;
 
   return (
     <section className="space-y-6">
@@ -379,51 +364,6 @@ export default function AdminHomePage() {
         </ChartCard>
       </div>
 
-      {isEmptyDashboard ? null : (
-        <div className="grid gap-6 xl:grid-cols-2">
-          <Card className="p-6">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <h2 className="text-xl font-semibold text-white">Recent users</h2>
-                <p className="mt-1 text-sm text-slate-400">Latest non-admin signups.</p>
-              </div>
-              <Users className="h-5 w-5 text-slate-400" />
-            </div>
-            <div className="mt-4 grid gap-3 md:grid-cols-2">
-              {(summary?.recentUsers ?? []).map((user) => (
-                <div key={user.id} className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <p className="font-medium text-white">{user.name}</p>
-                  <p className="text-sm text-slate-400">{user.email}</p>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <h2 className="text-xl font-semibold text-white">Recent expenses</h2>
-                <p className="mt-1 text-sm text-slate-400">Latest expense records from all users.</p>
-              </div>
-              <Banknote className="h-5 w-5 text-slate-400" />
-            </div>
-            <div className="mt-4 space-y-3">
-              {(summary?.recentExpenses ?? []).map((expense) => (
-                <div
-                  key={expense.id}
-                  className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
-                >
-                  <div>
-                    <p className="font-medium text-white">{expense.category}</p>
-                    <p className="text-sm text-slate-400">{expense.note || "-"}</p>
-                  </div>
-                  <p className="font-semibold text-white">Rs. {expense.amount.toFixed(2)}</p>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
-      )}
     </section>
   );
 }

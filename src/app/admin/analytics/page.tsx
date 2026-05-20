@@ -51,9 +51,9 @@ const palette = ["#34d399", "#60a5fa", "#f59e0b", "#f87171", "#a78bfa", "#22d3ee
 
 function MetricCard({ title, value, description, icon: Icon, accentClassName }: MetricCardProps) {
   return (
-    <Card className="relative overflow-hidden p-6">
+    <Card className="relative flex h-full min-h-[15rem] flex-col overflow-hidden p-6">
       <div className={`absolute inset-x-0 top-0 h-1 ${accentClassName}`} />
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex h-full items-start justify-between gap-4">
         <div>
           <p className="text-sm uppercase tracking-[0.24em] text-slate-400">{title}</p>
           <p className="mt-3 text-3xl font-semibold text-white">{value}</p>
