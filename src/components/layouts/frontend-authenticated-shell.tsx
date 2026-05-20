@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
 import { APP_NAME } from "@/lib/constants";
-import { ResponsiveAppShell } from "@/components/layouts/responsive-app-shell";
+import { ResponsiveAppShell, type AppNavItem } from "@/components/layouts/responsive-app-shell";
 
-const userNav = [
+const userNav: AppNavItem[] = [
   { href: "/frontend/dashboard", label: "Dashboard", iconKey: "dashboard" },
   { href: "/frontend/expenses", label: "Expenses", iconKey: "expenses" },
   { href: "/frontend/budgets", label: "Budgets", iconKey: "budgets" },
@@ -15,7 +15,7 @@ const userNav = [
   { href: "/frontend/settings", label: "Settings", iconKey: "settings" },
 ];
 
-const adminNav = [{ href: "/admin", label: "Admin", iconKey: "admin" }];
+const adminNav: AppNavItem[] = [{ href: "/admin", label: "Admin", iconKey: "admin" }];
 
 function UserBadge({
   name,

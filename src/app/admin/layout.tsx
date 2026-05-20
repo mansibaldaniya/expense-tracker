@@ -2,9 +2,9 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { APP_NAME } from "@/lib/constants";
 import { getServerUser } from "@/lib/session";
-import { ResponsiveAppShell } from "@/components/layouts/responsive-app-shell";
+import { ResponsiveAppShell, type AppNavItem } from "@/components/layouts/responsive-app-shell";
 
-const navItems = [
+const navItems: AppNavItem[] = [
   { href: "/admin", label: "Dashboard", iconKey: "dashboard" },
   { href: "/admin/users", label: "Users", iconKey: "users" },
   { href: "/admin/budget-categories", label: "Budget category", iconKey: "budget-categories" },
