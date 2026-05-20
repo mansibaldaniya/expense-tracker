@@ -1,13 +1,14 @@
 import Link from "next/link";
 import type { ComponentType, ReactNode } from "react";
-import { ChevronDown, LayoutDashboard, Users, LineChart as LineChartIcon } from "lucide-react";
+import { ChevronDown, LayoutDashboard, Tags, Users, LineChart as LineChartIcon } from "lucide-react";
 import { APP_NAME } from "@/lib/constants";
 import { getServerUser } from "@/lib/session";
 import { LogoutButton } from "@/components/shared/logout-button";
 
 const navItems = [
-  { href: "/admin", label: "Overview", icon: LayoutDashboard },
+  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/users", label: "Users", icon: Users },
+  { href: "/admin/budget-categories", label: "Budget category", icon: Tags },
   { href: "/admin/analytics", label: "Analytics", icon: LineChartIcon },
 ];
 

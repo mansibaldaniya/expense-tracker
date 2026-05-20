@@ -4,6 +4,7 @@ import { expenseQuerySchema, expenseSchema } from "@/lib/validations/expense";
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import { createPublicId } from "@/lib/public-id";
 import { ExpenseInput } from "@/types";
+import { budgetCategoryExists } from "@/services/budget-category.service";
 
 function toDateRange(month?: string, date?: string): Record<string, Date | string> {
   if (date) {
@@ -22,6 +23,9 @@ function toDateRange(month?: string, date?: string): Record<string, Date | strin
 
 export async function createExpense(userId: string, input: ExpenseInput) {
   const payload = expenseSchema.parse(input);
+  if (!(await budgetCategoryExists(payload.category))) {
+    throw new Error("Category is not available");
+  }
   const _id = new mongoose.Types.ObjectId();
   const expense = await ExpenseModel.create({
     _id,
@@ -134,6 +138,9 @@ export async function updateExpense(
   }
 
   const payload = expenseSchema.parse(input);
+  if (!(await budgetCategoryExists(payload.category))) {
+    throw new Error("Category is not available");
+  }
   const existing = await ExpenseModel.findOne({ _id: expenseId, userId }).lean();
   const expense = await ExpenseModel.findOneAndUpdate(
     { _id: expenseId, userId },

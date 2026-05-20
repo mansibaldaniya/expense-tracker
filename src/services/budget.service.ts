@@ -4,9 +4,13 @@ import { budgetQuerySchema, budgetSchema } from "@/lib/validations/budget";
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import { createPublicId } from "@/lib/public-id";
 import { BudgetInput } from "@/types";
+import { budgetCategoryExists } from "@/services/budget-category.service";
 
 export async function createBudget(userId: string, input: BudgetInput) {
   const payload = budgetSchema.parse(input);
+  if (!(await budgetCategoryExists(payload.category))) {
+    throw new Error("Category is not available");
+  }
   const _id = new mongoose.Types.ObjectId();
   const budget = await BudgetModel.findOneAndUpdate(
     {
@@ -117,6 +121,9 @@ export async function updateBudget(userId: string, budgetId: string, input: Budg
   }
 
   const payload = budgetSchema.parse(input);
+  if (!(await budgetCategoryExists(payload.category))) {
+    throw new Error("Category is not available");
+  }
   const existing = await BudgetModel.findOne({ _id: budgetId, userId }).lean();
   const budget = await BudgetModel.findOneAndUpdate(
     { _id: budgetId, userId },

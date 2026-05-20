@@ -1,19 +1,19 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import type { ComponentType, ReactNode } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { ArrowRight, CalendarRange, CircleDollarSign, ListFilter, NotebookPen } from "lucide-react";
 import { budgetSchema } from "@/lib/validations/budget";
-import { EXPENSE_CATEGORIES } from "@/lib/constants";
+import { useBudgetCategories } from "@/hooks/use-budget-categories";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MonthPicker } from "@/components/shared/month-picker";
 import { ThemeSelect } from "@/components/shared/theme-select";
 
 export type BudgetFormValues = {
-  category: (typeof EXPENSE_CATEGORIES)[number];
+  category: string;
   limit: string;
   month: string;
   year: string;
@@ -28,7 +28,7 @@ type BudgetFormProps = {
 };
 
 const baseDefaults: BudgetFormValues = {
-  category: "Food",
+  category: "",
   limit: "5000",
   month: new Date().toISOString().slice(0, 7),
   year: String(new Date().getFullYear()),
@@ -50,16 +50,22 @@ function FieldLabel({
 }
 
 export function BudgetForm({ title, description, submitLabel, defaultValues, onSubmit }: BudgetFormProps) {
-  const { register, control, handleSubmit, formState, reset } = useForm<BudgetFormValues>({
-    defaultValues: {
+  const { options: categoryOptions } = useBudgetCategories();
+  const resolvedDefaults = useMemo(
+    () => ({
       ...baseDefaults,
       ...defaultValues,
-    },
+      category: defaultValues?.category ?? categoryOptions[0]?.value ?? "",
+    }),
+    [categoryOptions, defaultValues]
+  );
+  const { register, control, handleSubmit, formState, reset } = useForm<BudgetFormValues>({
+    defaultValues: resolvedDefaults,
   });
 
   useEffect(() => {
-    reset({ ...baseDefaults, ...defaultValues });
-  }, [defaultValues, reset]);
+    reset(resolvedDefaults);
+  }, [resolvedDefaults, reset]);
 
   async function submit(values: BudgetFormValues) {
     const parsed = budgetSchema.safeParse({
@@ -99,7 +105,7 @@ export function BudgetForm({ title, description, submitLabel, defaultValues, onS
               <ThemeSelect
                 value={field.value}
                 onChange={field.onChange}
-                options={EXPENSE_CATEGORIES.map((item) => ({ label: item, value: item }))}
+                options={categoryOptions}
                 label="Category"
               />
             )}

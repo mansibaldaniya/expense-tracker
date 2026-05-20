@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
 import { getAuthFromRequest } from "@/lib/request-auth";
 import { apiError, apiSuccess } from "@/lib/api-response";
-import { extractExpenseWithGeminiFromFile } from "@/lib/gemini";
+import { extractExpenseFromFile } from "@/services/ai.service";
+import { listBudgetCategoryNames } from "@/services/budget-category.service";
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,11 +21,12 @@ export async function POST(request: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const extracted = await extractExpenseWithGeminiFromFile({
+    const categories = await listBudgetCategoryNames();
+    const extracted = await extractExpenseFromFile({
       buffer,
       mimeType: file.type || "application/octet-stream",
       fileName: file.name,
-    });
+    }, categories);
 
     return apiSuccess({ extracted }, "Expense extracted from file");
   } catch (error) {

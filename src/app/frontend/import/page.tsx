@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import { ExpenseForm } from "@/components/forms/expense-form";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { EXPENSE_CATEGORIES } from "@/lib/constants";
+import { useBudgetCategories } from "@/hooks/use-budget-categories";
 import type { ApiResponse } from "@/types";
 
 type ExtractedExpense = {
@@ -18,6 +18,7 @@ type ExtractedExpense = {
 
 export default function ImportPage() {
   const router = useRouter();
+  const { options: categoryOptions } = useBudgetCategories();
   const [text, setText] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [extracted, setExtracted] = useState<ExtractedExpense | null>(null);
@@ -175,9 +176,9 @@ export default function ImportPage() {
               submitLabel="Confirm & Save"
               defaultValues={{
                 amount: String(extracted.amount),
-                category: EXPENSE_CATEGORIES.includes(extracted.category as (typeof EXPENSE_CATEGORIES)[number])
-                  ? (extracted.category as (typeof EXPENSE_CATEGORIES)[number])
-                  : "Other",
+                category: categoryOptions.some((item) => item.value === extracted.category)
+                  ? extracted.category
+                  : categoryOptions[0]?.value ?? "",
                 date: extracted.date || today,
                 note: extracted.note,
               }}

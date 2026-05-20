@@ -34,14 +34,15 @@ export type ExtractedExpense = {
   note: string;
 };
 
-function buildExpensePrompt(context: string): string {
+function buildExpensePrompt(context: string, allowedCategories: string[]): string {
+  const categoryList = allowedCategories.length > 0 ? allowedCategories.join(", ") : "Other";
   return `
 You are an expense extraction engine.
 Extract the expense details from the input and return ONLY valid JSON.
 
 Rules:
 - amount must be a number.
-- category must be one of: Food, Transport, Shopping, Bills, Health, Entertainment, Education, Travel, Rent, Salary, Other.
+- category must be one of: ${categoryList}.
 - date must be in YYYY-MM-DD format. If relative words are used, infer the most likely date from the input. If no date is present, use today's date.
 - note should be a short merchant or description string.
 
@@ -68,13 +69,14 @@ function toExpenseOutput(parsed: ExtractedExpense): ExtractedExpense {
 }
 
 export async function extractExpenseWithGemini(
-  text: string
+  text: string,
+  allowedCategories: string[] = []
 ): Promise<ExtractedExpense> {
   const model = getGeminiClient().getGenerativeModel({
     model: getGeminiModelName(),
   });
 
-  const prompt = buildExpensePrompt(text);
+  const prompt = buildExpensePrompt(text, allowedCategories);
 
   const result = await model.generateContent(prompt);
   const responseText = result.response.text();
@@ -87,6 +89,7 @@ export async function extractExpenseWithGeminiFromFile(input: {
   buffer: Buffer;
   mimeType: string;
   fileName: string;
+  allowedCategories?: string[];
 }): Promise<ExtractedExpense> {
   const model = getGeminiClient().getGenerativeModel({
     model: getGeminiModelName(),
@@ -94,7 +97,8 @@ export async function extractExpenseWithGeminiFromFile(input: {
 
   const result = await model.generateContent([
     buildExpensePrompt(
-      `File name: ${input.fileName}\nMime type: ${input.mimeType}\nThe attached file contains the expense information.`
+      `File name: ${input.fileName}\nMime type: ${input.mimeType}\nThe attached file contains the expense information.`,
+      input.allowedCategories ?? []
     ),
     {
       inlineData: {

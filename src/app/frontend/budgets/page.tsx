@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { Pencil, Plus, RefreshCcw, Trash2 } from "lucide-react";
+import { Download, Pencil, Plus, RefreshCcw, Trash2 } from "lucide-react";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
 import { MonthPicker } from "@/components/shared/month-picker";
 import { Pagination } from "@/components/shared/pagination";
 import { ThemeSelect } from "@/components/shared/theme-select";
 import { Card } from "@/components/ui/card";
-import { EXPENSE_CATEGORIES } from "@/lib/constants";
+import { useBudgetCategories } from "@/hooks/use-budget-categories";
 import type { ApiResponse } from "@/types";
 
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -54,6 +54,7 @@ type BudgetFilters = {
 };
 
 export default function BudgetsPage() {
+  const { options: categoryOptions } = useBudgetCategories();
   const [budgets, setBudgets] = useState<BudgetItem[]>([]);
   const [pagination, setPagination] = useState<BudgetPagination>({
     page: 1,
@@ -113,6 +114,16 @@ export default function BudgetsPage() {
     await loadBudgets(budgets.length === 1 && pagination.page > 1 ? pagination.page - 1 : pagination.page);
   }
 
+  function exportCsv() {
+    const params = new URLSearchParams({
+      type: "budgets",
+      sortOrder: filters.sortOrder,
+    });
+    if (filters.category) params.set("category", filters.category);
+    if (filters.month) params.set("month", filters.month);
+    window.location.assign(`/api/export/csv?${params.toString()}`);
+  }
+
   return (
     <section className="space-y-6">
       <Card className="relative z-20 isolate p-6">
@@ -129,6 +140,14 @@ export default function BudgetsPage() {
             >
               <RefreshCcw className="h-4 w-4" />
               Refresh
+            </button>
+            <button
+              type="button"
+              onClick={exportCsv}
+              className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-white"
+            >
+              <Download className="h-4 w-4" />
+              Export CSV
             </button>
             <Link
               href="/frontend/budgets/new"
@@ -149,7 +168,7 @@ export default function BudgetsPage() {
             }}
             options={[
               { label: "All categories", value: "" },
-              ...EXPENSE_CATEGORIES.map((item) => ({ label: item, value: item })),
+              ...categoryOptions,
             ]}
             label="Category"
           />

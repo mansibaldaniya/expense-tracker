@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { ArrowRight } from "lucide-react";
 import { APP_NAME } from "@/lib/constants";
-import { EmptyState } from "@/components/shared/empty-state";
 import type { ApiResponse } from "@/types";
 
 type PublicOverview = {
@@ -22,6 +23,8 @@ type PublicOverview = {
 
 export default function FrontendHomePage() {
   const [overview, setOverview] = useState<PublicOverview | null>(null);
+  const [isAuthed, setIsAuthed] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     async function loadOverview() {
@@ -35,8 +38,29 @@ export default function FrontendHomePage() {
     void loadOverview();
   }, []);
 
+  useEffect(() => {
+    let active = true;
+
+    async function loadSession() {
+      const response = await fetch("/api/auth/me", { cache: "no-store" });
+      if (active) {
+        setIsAuthed(response.ok);
+      }
+    }
+
+    void loadSession();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   return (
-    <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+    <div
+      className={`grid gap-8 lg:items-center ${
+        isAuthed ? "lg:grid-cols-[1.2fr_0.8fr]" : "lg:grid-cols-1"
+      }`}
+    >
       <section className="space-y-6">
         <span className="inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm text-emerald-200">
           Finance automation for modern teams
@@ -50,12 +74,31 @@ export default function FrontendHomePage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Link href="/frontend/register" className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950">
-            Register
-          </Link>
-          <Link href="/frontend/login" className="rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-white">
-            Login
-          </Link>
+          {isAuthed ? (
+            <button
+              type="button"
+              onClick={() => router.push("/frontend/dashboard")}
+              className="inline-flex items-center gap-2 rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950"
+            >
+              Go to dashboard
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          ) : (
+            <>
+              <Link
+                href="/frontend/register"
+                className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950"
+              >
+                Register
+              </Link>
+              <Link
+                href="/frontend/login"
+                className="rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-white"
+              >
+                Login
+              </Link>
+            </>
+          )}
           <Link href="/frontend/about-us" className="rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-white">
             About Us
           </Link>
@@ -74,24 +117,23 @@ export default function FrontendHomePage() {
         </div>
       </section>
 
-      <section className="space-y-4">
-        {((overview?.recentExpenses ?? []).length === 0) ? (
-          <EmptyState className="min-h-[18rem]" />
-        ) : (
+      {isAuthed ? (
+        <section className="space-y-4">
           <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-emerald-950/20 backdrop-blur-xl">
             <div className="rounded-2xl bg-slate-950/50 p-4">
-              <p className="text-sm text-slate-400">Recent expense activity</p>
-              <div className="mt-4 space-y-3">
-                {overview?.recentExpenses.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3">
-                    <div>
-                      <p className="font-medium">{item.category}</p>
-                      <p className="text-xs text-slate-400">{new Date(item.date).toISOString().slice(0, 10)}</p>
-                    </div>
-                    <p className="font-semibold">Rs. {item.amount.toFixed(2)}</p>
-                  </div>
-                ))}
-              </div>
+              <p className="text-sm text-slate-400">Welcome back</p>
+              <p className="mt-2 text-2xl font-semibold text-white">Your dashboard is ready</p>
+              <p className="mt-2 text-sm leading-6 text-slate-300">
+                Open your dashboard to review expenses, budgets, insights, and admin-safe analytics.
+              </p>
+              <button
+                type="button"
+                onClick={() => router.push("/frontend/dashboard")}
+                className="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950"
+              >
+                Go to dashboard
+                <ArrowRight className="h-4 w-4" />
+              </button>
             </div>
             <div className="mt-4 rounded-2xl bg-gradient-to-br from-emerald-400/20 to-blue-400/20 p-4">
               <p className="text-sm text-slate-300">Dynamic data from MongoDB</p>
@@ -100,8 +142,8 @@ export default function FrontendHomePage() {
               </p>
             </div>
           </div>
-        )}
-      </section>
+        </section>
+      ) : null}
     </div>
   );
 }

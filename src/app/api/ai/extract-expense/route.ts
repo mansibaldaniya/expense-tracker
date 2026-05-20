@@ -5,6 +5,7 @@ import { AI_RATE_LIMIT } from "@/lib/constants";
 import { rateLimit } from "@/lib/rate-limit";
 import { aiExtractSchema } from "@/lib/validations/ai";
 import { extractExpense } from "@/services/ai.service";
+import { listBudgetCategoryNames } from "@/services/budget-category.service";
 import { apiError, apiSuccess } from "@/lib/api-response";
 
 export async function POST(request: NextRequest) {
@@ -21,7 +22,8 @@ export async function POST(request: NextRequest) {
     }
 
     const body = aiExtractSchema.parse(await request.json());
-    const extracted = await extractExpense(body.text);
+    const categories = await listBudgetCategoryNames();
+    const extracted = await extractExpense(body.text, categories);
     return apiSuccess({ extracted }, "Expense extracted");
   } catch (error) {
     return apiError(error instanceof Error ? error.message : "Unable to extract expense");

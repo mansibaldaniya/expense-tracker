@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import type { ComponentType, ReactNode } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { ArrowRight, CalendarDays, IndianRupee, ListFilter, NotebookPen } from "lucide-react";
 import { expenseSchema } from "@/lib/validations/expense";
-import { EXPENSE_CATEGORIES } from "@/lib/constants";
+import { useBudgetCategories } from "@/hooks/use-budget-categories";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,7 +14,7 @@ import { ThemeSelect } from "@/components/shared/theme-select";
 
 export type ExpenseFormValues = {
   amount: string;
-  category: (typeof EXPENSE_CATEGORIES)[number];
+  category: string;
   date: string;
   note: string;
 };
@@ -29,7 +29,7 @@ type ExpenseFormProps = {
 
 const baseDefaults: ExpenseFormValues = {
   amount: "",
-  category: "Food",
+  category: "",
   date: new Date().toISOString().slice(0, 10),
   note: "",
 };
@@ -50,16 +50,22 @@ function FieldLabel({
 }
 
 export function ExpenseForm({ title, description, submitLabel, defaultValues, onSubmit }: ExpenseFormProps) {
-  const { register, control, handleSubmit, formState, reset } = useForm<ExpenseFormValues>({
-    defaultValues: {
+  const { options: categoryOptions } = useBudgetCategories();
+  const resolvedDefaults = useMemo(
+    () => ({
       ...baseDefaults,
       ...defaultValues,
-    },
+      category: defaultValues?.category ?? categoryOptions[0]?.value ?? "",
+    }),
+    [categoryOptions, defaultValues]
+  );
+  const { register, control, handleSubmit, formState, reset } = useForm<ExpenseFormValues>({
+    defaultValues: resolvedDefaults,
   });
 
   useEffect(() => {
-    reset({ ...baseDefaults, ...defaultValues });
-  }, [defaultValues, reset]);
+    reset(resolvedDefaults);
+  }, [resolvedDefaults, reset]);
 
   async function submit(values: ExpenseFormValues) {
     const parsed = expenseSchema.safeParse(values);
@@ -97,7 +103,7 @@ export function ExpenseForm({ title, description, submitLabel, defaultValues, on
               <ThemeSelect
                 value={field.value}
                 onChange={field.onChange}
-                options={EXPENSE_CATEGORIES.map((item) => ({ label: item, value: item }))}
+                options={categoryOptions}
                 label="Category"
               />
             )}

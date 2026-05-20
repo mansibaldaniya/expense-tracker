@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Download, RefreshCcw, Search, Trash2, X, ArrowRight } from "lucide-react";
+import { Download, Pencil, Plus, RefreshCcw, Search, Trash2, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -12,48 +11,49 @@ import { ThemeSelect } from "@/components/shared/theme-select";
 import { Card } from "@/components/ui/card";
 import type { ApiResponse } from "@/types";
 
-type AdminUser = {
+type CategoryItem = {
   id: string;
   name: string;
-  email: string;
-  role: string;
+  normalizedName: string;
+  expenseCount: number;
+  budgetCount: number;
   createdAt: string;
+  updatedAt: string;
 };
 
-type AdminUserPagination = {
+type PaginationState = {
   page: number;
   limit: number;
   total: number;
   totalPages: number;
 };
 
-type UserFilters = {
+type FilterState = {
   search: string;
   sortOrder: "asc" | "desc";
 };
 
-export default function AdminUsersPage() {
-  const router = useRouter();
-  const [users, setUsers] = useState<AdminUser[]>([]);
-  const [pagination, setPagination] = useState<AdminUserPagination>({
+export default function AdminBudgetCategoriesPage() {
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [pagination, setPagination] = useState<PaginationState>({
     page: 1,
-    limit: 10,
+    limit: 8,
     total: 0,
     totalPages: 1,
   });
-  const [filters, setFilters] = useState<UserFilters>({
+  const [filters, setFilters] = useState<FilterState>({
     search: "",
     sortOrder: "desc",
   });
   const [loading, setLoading] = useState(true);
-  const [pendingDelete, setPendingDelete] = useState<AdminUser | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<CategoryItem | null>(null);
 
   useEffect(() => {
-    void loadUsers(pagination.page);
+    void loadCategories(pagination.page);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination.page, pagination.limit, filters.search, filters.sortOrder]);
 
-  async function loadUsers(page = pagination.page) {
+  async function loadCategories(page = pagination.page) {
     setLoading(true);
     const params = new URLSearchParams({
       page: String(page),
@@ -65,41 +65,41 @@ export default function AdminUsersPage() {
       params.set("search", filters.search.trim());
     }
 
-    const response = await fetch(`/api/admin/users?${params.toString()}`, { cache: "no-store" });
+    const response = await fetch(`/api/admin/budget-categories?${params.toString()}`, { cache: "no-store" });
     const payload = (await response.json()) as ApiResponse<{
-      users: AdminUser[];
-      pagination: AdminUserPagination;
+      categories: CategoryItem[];
+      pagination: PaginationState;
     }>;
 
     if (!response.ok) {
-      toast.error(payload.message ?? "Unable to load users");
+      toast.error(payload.message ?? "Unable to load budget categories");
       setLoading(false);
       return;
     }
 
-    setUsers(payload.data.users ?? []);
+    setCategories(payload.data.categories ?? []);
     setPagination(payload.data.pagination ?? { page, limit: pagination.limit, total: 0, totalPages: 1 });
     setLoading(false);
   }
 
-  async function deleteUser(userId: string) {
-    const response = await fetch(`/api/admin/users/${userId}`, { method: "DELETE" });
+  async function deleteCategory(category: CategoryItem) {
+    setPendingDelete(null);
+    const response = await fetch(`/api/admin/budget-categories/${category.id}`, { method: "DELETE" });
     const payload = (await response.json()) as ApiResponse<Record<string, never>>;
 
     if (!response.ok) {
-      toast.error(payload.message ?? "Unable to delete user");
+      toast.error(payload.message ?? "Unable to delete category");
       return;
     }
 
-    toast.success("User deleted");
-    setPendingDelete(null);
-    await loadUsers(users.length === 1 && pagination.page > 1 ? pagination.page - 1 : pagination.page);
-    router.refresh();
+    toast.success("Category deleted");
+    const nextPage = categories.length === 1 && pagination.page > 1 ? pagination.page - 1 : pagination.page;
+    await loadCategories(nextPage);
   }
 
   function exportCsv() {
     const params = new URLSearchParams({
-      type: "users",
+      type: "budget-categories",
       sortOrder: filters.sortOrder,
     });
     if (filters.search.trim()) {
@@ -110,16 +110,21 @@ export default function AdminUsersPage() {
 
   return (
     <section className="space-y-6">
-      <Card className="relative z-20 isolate p-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Users</p>
-            <h1 className="mt-2 text-2xl font-semibold text-white">User management</h1>
-            <p className="mt-2 text-sm text-slate-300">Search users, switch sorting, and review account creation dates.</p>
+      <Card className="p-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="max-w-3xl">
+            <div className="flex items-center gap-2">
+              <h1 className="text-3xl font-semibold text-white">Budget categories</h1>
+            </div>
+            <p className="mt-3 text-sm text-slate-400">
+              Create and maintain the category names used across budgets and expense tracking.
+            </p>
           </div>
+
           <div className="flex flex-wrap gap-3">
             <button
-              onClick={() => void loadUsers()}
+              type="button"
+              onClick={() => void loadCategories(pagination.page)}
               className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-white"
             >
               <RefreshCcw className="h-4 w-4" />
@@ -133,20 +138,28 @@ export default function AdminUsersPage() {
               <Download className="h-4 w-4" />
               Export CSV
             </button>
+            <Link
+              href="/admin/budget-categories/new"
+              className="inline-flex items-center gap-2 rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
+            >
+              <Plus className="h-4 w-4" />
+              Add category
+            </Link>
           </div>
         </div>
 
-        <div className="relative z-30 mt-6 grid items-end gap-3 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,0.9fr)_minmax(0,0.7fr)]">
+        <div className="mt-6 grid items-end gap-3 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,0.9fr)_minmax(0,0.7fr)]">
           <div className="relative">
             <label className="mb-2 block text-sm text-slate-400">Search</label>
             <div className="flex h-12 items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 text-white">
+              <Search className="h-4 w-4 shrink-0 text-slate-400" />
               <input
                 value={filters.search}
                 onChange={(event) => {
                   setPagination((current) => ({ ...current, page: 1 }));
                   setFilters((current) => ({ ...current, search: event.target.value }));
                 }}
-                placeholder="Search by name or email"
+                placeholder="Search category name"
                 className="w-full bg-transparent text-sm text-white placeholder:text-slate-500 outline-none"
               />
               <button
@@ -159,7 +172,7 @@ export default function AdminUsersPage() {
                 aria-label={filters.search ? "Clear search" : "Search"}
                 className="shrink-0 rounded-full p-1 text-slate-400 transition hover:bg-white/10 hover:text-white"
               >
-                {filters.search ? <X className="h-4 w-4" /> : <Search className="h-4 w-4" />}
+                {filters.search ? <X className="h-4 w-4" /> : null}
               </button>
             </div>
           </div>
@@ -174,30 +187,28 @@ export default function AdminUsersPage() {
               { label: "Created: Newest first", value: "desc" },
               { label: "Created: Oldest first", value: "asc" },
             ]}
-            label="Created At"
+            label="Sort by created date"
           />
 
           <button
             type="button"
             onClick={() => {
-              setPagination((current) => ({ ...current, page: 1 }));
               setFilters({ search: "", sortOrder: "desc" });
+              setPagination((current) => ({ ...current, page: 1 }));
             }}
             className="inline-flex h-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-white transition-colors hover:border-emerald-400/30 hover:bg-white/8"
           >
             Clear all
           </button>
         </div>
-      </Card>
 
-      <Card className="relative z-10 p-6">
-        <div className="overflow-hidden rounded-2xl border border-white/10">
+        <div className="mt-5 overflow-hidden rounded-2xl border border-white/10">
           <table className="min-w-full divide-y divide-white/10 text-sm">
             <thead className="bg-white/5 text-left text-slate-300">
               <tr>
                 <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3">Email</th>
-                <th className="px-4 py-3">Role</th>
+                <th className="px-4 py-3">Expense use</th>
+                <th className="px-4 py-3">Budget use</th>
                 <th className="px-4 py-3">Created</th>
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
@@ -206,78 +217,84 @@ export default function AdminUsersPage() {
               {loading ? (
                 <tr>
                   <td className="px-4 py-6 text-slate-400" colSpan={5}>
-                    Loading users...
+                    Loading budget categories...
                   </td>
                 </tr>
-              ) : users.length === 0 ? (
-                <tr>
-                  <td className="px-4 py-6" colSpan={5}>
-                    <EmptyState className="min-h-[8rem]" />
-                  </td>
-                </tr>
-              ) : (
-                users.map((user) => (
-                  <tr key={user.id}>
-                    <td className="px-4 py-3 font-medium text-white">
-                      <Link href={`/admin/users/${user.id}`} className="hover:text-emerald-300">
-                        {user.name}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3 text-slate-300">{user.email}</td>
-                    <td className="px-4 py-3">
-                      <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-200">
-                        {user.role}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-slate-300">{new Date(user.createdAt).toISOString().slice(0, 10)}</td>
-                    <td className="px-4 py-3 text-right">
+              ) : categories.length ? (
+                categories.map((category) => (
+                  <tr key={category.id}>
+                    <td className="px-4 py-4 font-medium text-white">{category.name}</td>
+                    <td className="px-4 py-4 text-slate-300">{category.expenseCount.toLocaleString()}</td>
+                    <td className="px-4 py-4 text-slate-300">{category.budgetCount.toLocaleString()}</td>
+                    <td className="px-4 py-4 text-slate-300">{new Date(category.createdAt).toISOString().slice(0, 10)}</td>
+                    <td className="px-4 py-4">
                       <div className="flex justify-end gap-2">
                         <Link
-                          href={`/admin/users/${user.id}`}
+                          href={`/admin/budget-categories/${category.id}/edit`}
                           className="inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 text-xs text-slate-200 transition hover:bg-white/10"
                         >
-                          View
-                          <ArrowRight className="h-3.5 w-3.5" />
+                          <Pencil className="h-3.5 w-3.5" />
+                          Edit
                         </Link>
                         <button
                           type="button"
-                          onClick={() => setPendingDelete(user)}
-                          className="inline-flex items-center gap-2 rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1.5 text-xs text-red-200 transition hover:bg-red-500/20"
+                          onClick={() => setPendingDelete(category)}
+                          disabled={category.expenseCount > 0}
+                          className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs transition ${
+                            category.expenseCount > 0
+                              ? "cursor-not-allowed border-white/10 bg-white/5 text-slate-500"
+                              : "border-red-400/20 bg-red-500/10 text-red-200 hover:bg-red-500/20"
+                          }`}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
-                          Delete
+                          {category.expenseCount > 0 ? "In use" : "Delete"}
                         </button>
                       </div>
                     </td>
                   </tr>
                 ))
+              ) : (
+                <tr>
+                  <td className="px-4 py-6" colSpan={5}>
+                    <EmptyState className="min-h-[8rem]" />
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
         </div>
-      </Card>
 
-      <Pagination
-        page={pagination.page}
-        totalPages={pagination.totalPages}
-        total={pagination.total}
-        pageSize={pagination.limit}
-        onPageChange={(page) => setPagination((current) => ({ ...current, page }))}
-      />
+        <Pagination
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          total={pagination.total}
+          pageSize={pagination.limit}
+          onPageChange={(page) => setPagination((current) => ({ ...current, page }))}
+          className="mt-4"
+        />
+      </Card>
 
       <ConfirmDialog
         open={pendingDelete !== null}
-        title="Delete user?"
+        title="Delete category?"
         description={
           pendingDelete
-            ? `This will hard delete ${pendingDelete.name} and remove their budgets and expenses.`
+            ? pendingDelete.expenseCount > 0
+              ? `This category is still used by ${pendingDelete.expenseCount} expense(s), so it cannot be deleted.`
+              : `This will remove the ${pendingDelete.name} category from the admin catalog.`
             : ""
         }
-        confirmLabel="Delete user"
+        confirmLabel="Delete category"
+        confirmVariant="destructive"
         onCancel={() => setPendingDelete(null)}
         onConfirm={async () => {
           if (!pendingDelete) return;
-          await deleteUser(pendingDelete.id);
+          if (pendingDelete.expenseCount > 0) {
+            toast.error("Category is in use by expenses and cannot be deleted");
+            setPendingDelete(null);
+            return;
+          }
+          await deleteCategory(pendingDelete);
         }}
       />
     </section>
