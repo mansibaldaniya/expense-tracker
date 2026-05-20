@@ -9,7 +9,7 @@ export async function GET() {
     await connectDB();
 
     const [totalUsers, totalExpenses, totalBudgets, recentExpenses] = await Promise.all([
-      UserModel.countDocuments(),
+      UserModel.countDocuments({ role: "user" }),
       ExpenseModel.countDocuments(),
       BudgetModel.countDocuments(),
       ExpenseModel.find().sort({ createdAt: -1 }).limit(3).lean(),
