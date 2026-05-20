@@ -88,3 +88,32 @@ Create a `.env` file from `.env.example` and set:
 - Admin bootstrap uses `ADMIN_EMAIL`, `ADMIN_NAME`, and `ADMIN_PASSWORD` to ensure an admin user exists in MongoDB.
 - AI requests are rate limited in memory for safety.
 - The app is Vercel-ready once the environment variables are configured.
+
+## Vercel Deployment
+
+1. Create a MongoDB Atlas database and copy the connection string into `MONGODB_URI`.
+2. In Vercel, add these environment variables for Production, Preview, and Development:
+   - `MONGODB_URI`
+   - `JWT_SECRET`
+   - `GEMINI_API_KEY`
+   - `GEMINI_MODEL` if you want something other than `gemini-2.5-flash`
+   - `NEXT_PUBLIC_APP_URL`
+   - `ADMIN_EMAIL`
+   - `ADMIN_NAME`
+   - `ADMIN_PASSWORD`
+3. Set `NEXT_PUBLIC_APP_URL` to your Vercel domain, for example `https://your-app.vercel.app`.
+4. Deploy the repository to Vercel. The app uses the Node.js runtime and connects to Atlas through `src/lib/db.ts`.
+
+### Recommended Atlas URI format
+
+Use the standard Atlas format with a database name, for example:
+
+```bash
+mongodb+srv://<user>:<password>@<cluster>.mongodb.net/expense-tracker?retryWrites=true&w=majority
+```
+
+### Notes for Vercel
+
+- Keep the MongoDB user restricted to the app database.
+- Do not commit your production `.env` file.
+- If you rotate `JWT_SECRET`, existing sessions will expire and users will need to sign in again.

@@ -6,7 +6,7 @@ type MongooseCache = {
   promise: Promise<typeof mongoose> | null;
 };
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI?.trim();
 
 if (!MONGODB_URI) {
   throw new Error("Please define the MONGODB_URI environment variable");
@@ -36,7 +36,10 @@ export async function connectDB(): Promise<typeof mongoose> {
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI_STRING);
+    cached.promise = mongoose.connect(MONGODB_URI_STRING, {
+      serverSelectionTimeoutMS: 10000,
+      maxPoolSize: 10,
+    });
   }
 
   cached.conn = await cached.promise;
